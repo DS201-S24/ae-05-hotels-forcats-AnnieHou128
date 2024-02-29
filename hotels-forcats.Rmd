@@ -13,6 +13,7 @@ We'll be using the same `hotels` dataset as previously.
 ```{r load-pkg, message = FALSE}
 library(tidyverse)
 library(skimr)
+library(forcats)
 ```
 
 ```{r load-data, message = FALSE}
@@ -26,7 +27,8 @@ First, knit this document and view the following visualization.
 
 ```{r plot, fig.width=10}
 hotels %>%
-  group_by(hotel, arrival_date_month) %>%                # group by hotel type and arrival month
+    mutate(arrival_date_month = fct_relevel(arrival_date_month, c("January", "February", "March", "April", "May", "June", "July", "September", "October", "November", "December"))) %>%
+  group_by(hotel, arrival_date_month) %>% # group by hotel type and arrival month
   summarize(mean_adr = mean(adr), .groups = "keep") %>%  # calculate mean adr for each group
   ggplot(aes(
     x = arrival_date_month,                              # x-axis = arrival_date_month
@@ -40,7 +42,8 @@ hotels %>%
        y = "Mean ADR (average daily rate)",
        title = "Comparison of resort and city hotel prices across months",
        subtitle = "Resort hotel prices soar in the summer while ciry hotel prices remain relatively constant throughout the year",
-       color = "Hotel type")
+       color = "Hotel type") +
+  scale_y_continuous(limits = c(0, 200), labels = scales::label_dollar(prefix = "", suffix = "$"))
 ```
 
 <br>
